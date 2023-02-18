@@ -10,7 +10,7 @@ export default class LoggerUtility {
         this.logger = createLogger(fileName)
     }
 
-    log(data: unknown, type: LogType = 'info') {
+    log = (data: unknown, type: LogType = 'info') => {
         switch (type) {
             case 'debug':
                 this.logger.debug(data)
