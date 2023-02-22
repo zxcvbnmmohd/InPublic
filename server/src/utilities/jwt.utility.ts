@@ -1,10 +1,10 @@
-import config from 'config'
+import { ENV } from '@/configs'
 import type { SignOptions } from 'jsonwebtoken'
 import jwt from 'jsonwebtoken'
 
 export default class JwtUtility {
-    signJwt = (payload: object, options: SignOptions = {}) => {
-        const privateKey = Buffer.from(config.get<string>('accessTokenPrivateKey'), 'base64').toString('ascii')
+    static sign = (payload: object, options: SignOptions = {}): string => {
+        const privateKey = Buffer.from(ENV.ACCESS_TOKEN_PRIVATE_KEY!, 'base64').toString('ascii')
 
         return jwt.sign(payload, privateKey, {
             ...(options && options),
@@ -12,9 +12,9 @@ export default class JwtUtility {
         })
     }
 
-    verifyJwt = <T>(token: string): T | null => {
+    static verify = <T>(token: string): T | null => {
         try {
-            const publicKey = Buffer.from(config.get<string>('accessTokenPublicKey'), 'base64').toString('ascii')
+            const publicKey = Buffer.from(ENV.ACCESS_TOKEN_PUBLIC_KEY!, 'base64').toString('ascii')
 
             return jwt.verify(token, publicKey) as T
         } catch (error) {

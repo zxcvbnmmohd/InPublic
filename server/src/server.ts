@@ -4,7 +4,7 @@ import type { Express, NextFunction, Request, Response } from 'express'
 import express from 'express'
 
 import { ENV } from '@/configs'
-import { IdeaRoutes, UserRoutes } from '@/routes'
+import { CommentRoutes, IdeaRoutes, UserRoutes } from '@/routes'
 import { DatabaseService } from '@/services'
 import { LoggerUtility } from '@/utilities'
 
@@ -12,10 +12,12 @@ const databaseService: DatabaseService = new DatabaseService()
 const loggerUtility: LoggerUtility = new LoggerUtility('Serveßr')
 const server: Express = express()
 
+server.use(express.json())
+
+CommentRoutes(server)
 IdeaRoutes(server)
 UserRoutes(server)
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 server.use((error: any, _: Request, res: Response, __: NextFunction) => {
     error.status = error.status || 'error'
     error.statusCode = error.statusCode || 500

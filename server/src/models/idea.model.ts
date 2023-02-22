@@ -1,37 +1,75 @@
-import mongoose from 'mongoose'
+import type { Document } from 'mongoose'
+import mongoose, { Schema } from 'mongoose'
 
-const IdeaSchema = new mongoose.Schema(
+interface Media extends Document {
+    data: Buffer
+    filename: String
+    mimetype: String
+    size: Number
+}
+interface IdeaDocument extends Document {
+    id: Schema.Types.ObjectId
+    ownerId: Schema.Types.ObjectId
+    text: String
+    media?: Media | null
+    likes: Schema.Types.ObjectId[]
+    comments: Schema.Types.ObjectId[]
+    createdAt: Date
+    updatedAt: Date
+}
+
+const IdeaSchema: Schema<IdeaDocument> = new Schema<IdeaDocument>(
     {
-        userId: {
-            type: mongoose.Schema.Types.ObjectId,
+        id: {
+            type: Schema.Types.ObjectId,
             required: true,
+        },
+        ownerId: {
+            type: Schema.Types.ObjectId,
             ref: 'User',
+            required: true,
         },
         text: {
             type: String,
             required: true,
             trim: true,
         },
-        image: {
-            type: Buffer,
+        media: {
+            type: {
+                data: Buffer,
+                filename: String,
+                mimetype: String,
+                size: Number,
+            },
         },
         likes: {
-            type: Array,
+            type: [Schema.Types.ObjectId],
             default: [],
         },
-        comments: [
-            {
-                text: String,
-                createdAt: { type: Date, default: Date.now },
-                postedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-            },
-        ],
+        comments: {
+            ref: 'Comment',
+            type: [Schema.Types.ObjectId],
+            default: [],
+        },
     },
-    {
-        timestamps: true,
-    },
+    { timestamps: true },
 )
 
 const IdeaModel = mongoose.model('Idea', IdeaSchema)
 
 export default IdeaModel
+
+export type { IdeaDocument }
+
+// Sample use
+// const upload = multer();
+
+// app.post('/upload', upload.single('file'), async (req, res) => {
+//   const media = await Media.create({
+//     data: req.file.buffer,
+//     filename: req.file.originalname,
+//     mimetype: req.file.mimetype,
+//     size: req.file.size,
+//   });
+//   res.json(media);
+// });
