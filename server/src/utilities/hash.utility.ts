@@ -1,7 +1,7 @@
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcryptjs'
 
 export default class HashUtility {
-    static hash = async (password: string, strength: number = 8): Promise<string> => {
+    static hash = async (password: string, strength: number = 12): Promise<string> => {
         return await bcrypt.hash(password, strength)
     }
 

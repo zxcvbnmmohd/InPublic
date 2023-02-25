@@ -5,42 +5,20 @@ import validator from 'validator'
 import { ERRORS } from '@/configs'
 import { HashUtility } from '@/utilities'
 
-interface UserDocument extends Document {
+interface AuthDocument extends Document {
     id: Schema.Types.ObjectId
-    selfie?: Buffer
-    firstName: string
-    lastName: string
     email: string
     username: string
     password: string
-    location?: string
-    website?: string
-    bio?: string
     tokens: string[]
-    followers: string[]
-    following: string[]
     isActive: boolean
+    lastLogin: Date
 }
 
-const UserSchema: Schema<UserDocument> = new Schema<UserDocument>(
+const AuthSchema: Schema<AuthDocument> = new Schema<AuthDocument>(
     {
         id: {
             type: Schema.Types.ObjectId,
-        },
-        selfie: {
-            type: Buffer,
-        },
-        firstName: {
-            type: String,
-            trim: true,
-            minlength: 2,
-            required: true,
-        },
-        lastName: {
-            type: String,
-            trim: true,
-            minlength: 2,
-            required: true,
         },
         username: {
             type: String,
@@ -66,33 +44,39 @@ const UserSchema: Schema<UserDocument> = new Schema<UserDocument>(
                 }
             },
         },
-        location: {
+        password: {
             type: String,
+            trim: true,
+            minlength: 8,
+            required: true,
+            validate(value: string) {
+                if (value.toLowerCase().includes('password')) {
+                    throw new Error(ERRORS.INVALID_PASSWORD)
+                }
+            },
         },
-        website: {
-            type: String,
-        },
-        bio: {
-            type: String,
-        },
-        followers: {
+        tokens: {
             type: [String],
             default: [],
-        },
-        following: {
-            type: [String],
-            default: [],
+            required: true,
         },
         isActive: {
             type: Boolean,
             default: true,
             required: true,
         },
+        lastLogin: {
+            type: Date,
+            default: Date.now,
+            required: true,
+        },
     },
     { timestamps: true },
 )
 
-UserSchema.pre('save', async function (next) {
+const AuthModel = model<AuthDocument>('Auth', AuthSchema)
+
+AuthSchema.pre('save', async function (next) {
     const user = this
 
     if (user.isModified('password')) {
@@ -108,18 +92,46 @@ UserSchema.pre('save', async function (next) {
     next()
 })
 
-UserSchema.methods.toResources = function () {
+AuthSchema.methods.toResources = function () {
     return {
         _id: this.id,
-        firstname: this.firstName,
-        lastname: this.lastName,
         username: this.username,
         email: this.email,
     }
 }
 
-const UserModel = model<UserDocument>('User', UserSchema)
+AuthSchema.statics.loginByEmail = async (email: string, password: string): Promise<AuthDocument> => {
+    const user = await AuthModel.findOne({ email })
 
-export { UserModel }
+    if (!user) {
+        throw new Error(ERRORS.USER_NOT_FOUND)
+    }
 
-export type { UserDocument }
+    const validPassword = await HashUtility.compare(password, user.password)
+
+    if (!validPassword) {
+        throw new Error(ERRORS.INVALID_PASSWORD)
+    }
+
+    return user
+}
+
+AuthSchema.statics.loginByUsername = async (username: string, password: string): Promise<AuthDocument> => {
+    const user = await AuthModel.findOne({ username })
+
+    if (!user) {
+        throw new Error(ERRORS.USER_NOT_FOUND)
+    }
+
+    const validPassword = await HashUtility.compare(password, user.password)
+
+    if (!validPassword) {
+        throw new Error(ERRORS.INVALID_PASSWORD)
+    }
+
+    return user
+}
+
+export default AuthModel
+
+export type { AuthDocument }

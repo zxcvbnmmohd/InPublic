@@ -1,77 +1,31 @@
-import { UserModel } from '@/models'
-import { JwtUtility } from '@/utilities'
 import type { NextFunction, Request, Response } from 'express'
 
-// @desc      Login a user
-// @route     POST /api/login
+// @desc      Create an User
+// @route     POST /api/v1/create-User
 // @access    Public
-const login = async (_: Request, __: Response, ___: NextFunction) => {
+const createUser = async (_: Request, __: Response, ___: NextFunction) => {
     return null
 }
 
-// @desc      Register a user
-// @route     POST /api/register
+// @desc      Update an User
+// @route     POST /api/v1/update-User
 // @access    Public
-const register = async (req: Request, res: Response, ___: NextFunction) => {
-    let code = 500
-    let response = {}
-
-    console.log(req.body)
-    try {
-        const { firstName, lastName, username, email, password } = req.body
-
-        if (!firstName || !lastName || !username || !email || !password) {
-            code = 400
-            response = {
-                message: 'Please fill in all fields',
-            }
-        } else {
-            const isExist = await UserModel.findOne({ email })
-
-            if (isExist) {
-                code = 400
-                response = {
-                    message: 'User already exists',
-                }
-            } else {
-                const user = await UserModel.create(req.body)
-                const token: string = JwtUtility.sign(user.toJSON())
-
-                user.tokens.push(token)
-
-                await user.save()
-
-                code = 200
-                response = {
-                    message: 'User created',
-                    data: user.toJSON,
-                    token,
-                }
-            }
-        }
-
-        return res.status(code).json(response)
-    } catch (error) {
-        code = 500
-        response = {
-            message: 'Server error',
-            error,
-        }
-
-        return res.status(code).json(response)
-    }
+const updateUser = async (_: Request, __: Response, ___: NextFunction) => {
+    return null
 }
 
-export { login, register }
+// @desc      Read an User
+// @route     POST /api/v1/read-User
+// @access    Public
+const readUser = async (_: Request, __: Response, ___: NextFunction) => {
+    return null
+}
 
-// Sample User Data JSON
-// {
-//     "firstName": "Mohamed",
-//     "lastName": "Mohamed",
-//     "email": "mohd@mohd.ca",
-//     "username": "mohd",
-//     "password": "mohamed1",
-//     "location": "Toronto, ON",
-//     "website": "mohd.ca",
-//     "bio": "Hello World!"
-// }
+// @desc      Delete an User
+// @route     POST /api/v1/delete-User
+// @access    Public
+const deleteUser = async (_: Request, __: Response, ___: NextFunction) => {
+    return null
+}
+
+export { createUser, deleteUser, readUser, updateUser }
