@@ -11,7 +11,7 @@ const IdeaRoutes = (app: Express) => {
     router.route('/update').post(IdeaController.updateIdea)
     router.route('/delete').post(IdeaController.deleteIdea)
 
-    return app.use('/api/v1/', router)
+    return app.use('/api/v1/idea', router)
 }
 
 export default IdeaRoutes

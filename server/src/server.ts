@@ -1,12 +1,12 @@
 import 'module-alias/register'
 
-import bodyparser from "body-parser"
+import bodyparser from 'body-parser'
 import cookieParser from 'cookie-parser'
 import type { Express, NextFunction, Request, Response } from 'express'
 import express from 'express'
 
 import { ENV } from '@/configs'
-import { CommentRoutes, IdeaRoutes, UserRoutes } from '@/routes'
+import { AuthRoutes, CommentRoutes, IdeaRoutes, UserRoutes } from '@/routes'
 import { DatabaseService } from '@/services'
 import { LoggerUtility } from '@/utilities'
 
@@ -14,10 +14,11 @@ const server: Express = express()
 const databaseService: DatabaseService = new DatabaseService()
 const loggerUtility: LoggerUtility = new LoggerUtility('Server')
 
-server.use(bodyparser.urlencoded({extended:true}));
+server.use(bodyparser.urlencoded({ extended: true }))
 server.use(express.json())
-server.use(cookieParser());
+server.use(cookieParser())
 
+AuthRoutes(server)
 CommentRoutes(server)
 IdeaRoutes(server)
 UserRoutes(server)

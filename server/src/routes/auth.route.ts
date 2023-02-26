@@ -9,7 +9,7 @@ const UserRoutes = (app: Express) => {
     router.route('/register').post(AuthController.register)
     router.route('/login').post(AuthController.login)
 
-    return app.use('/api/v1/', router)
+    return app.use('/api/v1/auth', router)
 }
 
 export default UserRoutes

@@ -11,7 +11,7 @@ const CommentRoutes = (app: Express) => {
     router.route('/update').post(CommentController.updateComment)
     router.route('/delete').post(CommentController.deleteComment)
 
-    return app.use('/api/v1/', router)
+    return app.use('/api/v1/comment', router)
 }
 
 export default CommentRoutes

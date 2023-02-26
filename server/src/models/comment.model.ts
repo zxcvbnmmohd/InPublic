@@ -1,5 +1,5 @@
-import type { Document } from 'mongoose'
-import mongoose, { Schema } from 'mongoose'
+import { Document, Model, model } from 'mongoose'
+import { Schema } from 'mongoose'
 
 interface CommentDocument extends Document {
     id: Schema.Types.ObjectId
@@ -8,7 +8,17 @@ interface CommentDocument extends Document {
     replies: Comment[]
 }
 
-const CommentSchema: Schema<CommentDocument> = new Schema<CommentDocument>(
+interface CommentMethods {
+}
+
+interface CommentModel extends Model<CommentDocument, {}, CommentMethods> {
+}
+
+const CommentSchema: Schema<CommentDocument, CommentModel, CommentMethods> = new Schema<
+    CommentDocument,
+    CommentModel,
+    CommentMethods
+>(
     {
         id: {
             type: Schema.Types.ObjectId,
@@ -36,8 +46,8 @@ const CommentSchema: Schema<CommentDocument> = new Schema<CommentDocument>(
     { timestamps: true },
 )
 
-const CommentModel = mongoose.model('Comment', CommentSchema)
+const Comment = model<CommentDocument, CommentModel>('Comment', CommentSchema)
 
-export default CommentModel
+export default Comment
 
-export type { CommentDocument }
+export type { CommentDocument, CommentMethods, CommentModel }

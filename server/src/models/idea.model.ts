@@ -1,5 +1,5 @@
-import type { Document } from 'mongoose'
-import mongoose, { Schema } from 'mongoose'
+import { Document, Model, model } from 'mongoose'
+import { Schema } from 'mongoose'
 
 interface Media extends Document {
     data: Buffer
@@ -13,12 +13,16 @@ interface IdeaDocument extends Document {
     text: String
     media?: Media | null
     likes: Schema.Types.ObjectId[]
-    comments: Schema.Types.ObjectId[]
+    Ideas: Schema.Types.ObjectId[]
     createdAt: Date
     updatedAt: Date
 }
 
-const IdeaSchema: Schema<IdeaDocument> = new Schema<IdeaDocument>(
+interface IdeaMethods {}
+
+interface IdeaModel extends Model<IdeaDocument, {}, IdeaMethods> {}
+
+const IdeaSchema: Schema<IdeaDocument, IdeaModel, IdeaMethods> = new Schema<IdeaDocument, IdeaModel, IdeaMethods>(
     {
         id: {
             type: Schema.Types.ObjectId,
@@ -46,8 +50,8 @@ const IdeaSchema: Schema<IdeaDocument> = new Schema<IdeaDocument>(
             type: [Schema.Types.ObjectId],
             default: [],
         },
-        comments: {
-            ref: 'Comment',
+        Ideas: {
+            ref: 'Idea',
             type: [Schema.Types.ObjectId],
             default: [],
         },
@@ -55,11 +59,11 @@ const IdeaSchema: Schema<IdeaDocument> = new Schema<IdeaDocument>(
     { timestamps: true },
 )
 
-const IdeaModel = mongoose.model('Idea', IdeaSchema)
+const Idea = model<IdeaDocument, IdeaModel>('Idea', IdeaSchema)
 
-export default IdeaModel
+export default Idea
 
-export type { IdeaDocument }
+export type { IdeaDocument, IdeaMethods, IdeaModel }
 
 // Sample use
 // const upload = multer();

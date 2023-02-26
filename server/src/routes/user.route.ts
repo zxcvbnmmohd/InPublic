@@ -11,7 +11,7 @@ const UserRoutes = (app: Express) => {
     router.route('/update').post(UserController.updateUser)
     router.route('/delete').post(UserController.deleteUser)
 
-    return app.use('/api/v1/', router)
+    return app.use('/api/v1/user', router)
 }
 
 export default UserRoutes

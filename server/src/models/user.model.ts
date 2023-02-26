@@ -1,4 +1,4 @@
-import type { Document } from 'mongoose'
+import type { Document, Model } from 'mongoose'
 import { model, Schema } from 'mongoose'
 import validator from 'validator'
 
@@ -22,13 +22,18 @@ interface UserDocument extends Document {
     isActive: boolean
 }
 
-const UserSchema: Schema<UserDocument> = new Schema<UserDocument>(
+interface UserMethods {}
+
+interface UserModel extends Model<UserDocument, {}, UserMethods> {}
+
+const UserSchema: Schema<UserDocument, UserModel, UserMethods> = new Schema<UserDocument, UserModel, UserMethods>(
     {
         id: {
             type: Schema.Types.ObjectId,
         },
         selfie: {
             type: Buffer,
+            required: false,
         },
         firstName: {
             type: String,
@@ -68,20 +73,33 @@ const UserSchema: Schema<UserDocument> = new Schema<UserDocument>(
         },
         location: {
             type: String,
+            trim: true,
+            required: false,
         },
         website: {
             type: String,
+            trim: true,
+            required: false,
+            validate(value: string) {
+                if (!validator.isURL(value)) {
+                    throw new Error(ERRORS.INVALID_URL)
+                }
+            },
         },
         bio: {
             type: String,
+            trim: true,
+            required: false,
         },
         followers: {
             type: [String],
             default: [],
+            required: true,
         },
         following: {
             type: [String],
             default: [],
+            required: true,
         },
         isActive: {
             type: Boolean,
@@ -118,8 +136,8 @@ UserSchema.methods.toResources = function () {
     }
 }
 
-const UserModel = model<UserDocument>('User', UserSchema)
+const User = model<UserDocument, UserModel>('User', UserSchema)
 
-export { UserModel }
+export default User
 
-export type { UserDocument }
+export type { UserDocument, UserMethods, UserModel }
